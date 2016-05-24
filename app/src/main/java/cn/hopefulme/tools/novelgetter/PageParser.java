@@ -47,7 +47,7 @@ public class PageParser {
         return next;
     }
 
-    public PageParser(final String url) {
+    public PageParser(final String url,final Runnable callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -61,6 +61,7 @@ public class PageParser {
                     last = parserLast();
                     parser.reset();
                     next = parserNext();
+                    callback.run();
                 }catch (MalformedURLException e) {
                 }catch (IOException e) {
                 }catch (ParserException e) {

@@ -35,15 +35,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void parser(String url) {
-        pageParser = new PageParser(url);
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        pageParser = new PageParser(url,new Runnable() {
             @Override
             public void run() {
-                ((TextView)findViewById(R.id.tv_bookname)).setText(pageParser.getBookName());
-                ((TextView)findViewById(R.id.tv_content)).setText(pageParser.getContent());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView)findViewById(R.id.tv_bookname)).setText(pageParser.getBookName());
+                        ((TextView)findViewById(R.id.tv_content)).setText(pageParser.getContent());
+                    }
+                });
             }
-        },1000);
+        });
     }
 }
