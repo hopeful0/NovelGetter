@@ -1,11 +1,12 @@
 package cn.hopefulme.tools.novelgetter;
 
 import android.content.DialogInterface;
-import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
 
     NovelParser novelParser;
 
+    AlertDialog inputDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,22 +24,71 @@ public class MainActivity extends AppCompatActivity {
 
         //----------------
         //test code
-        novelParser = new NovelParser("http://www.biquge.la/book/176/");
 
-        parser("http://www.biquge.la/book/176/143150.html");
+        showEditTextDialog();
+
+        //----------------
+    }
+
+    private void showEditTextDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("输入源")
+                .setView(R.layout.dialog_input)
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText et_input = (EditText) inputDialog.getWindow().findViewById(R.id.et_input);
+                        String input = et_input.getText().toString().trim();
+                        if(!input.startsWith("http://")) input = "http://" + input;
+                        parserNovel(input);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setCancelable(false);
+        inputDialog = builder.create();
+        inputDialog.show();
+    }
+
+    private void parserNovel(String url) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(new ProgressBar(this))
+                .setTitle("Loading...")
+                .setCancelable(false);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        novelParser = new NovelParser(url, new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        parserPage(novelParser.getListLink(0));
+                    }
+                });
+            }
+        });
 
         findViewById(R.id.btn_last).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(pageParser.getLast() == null) return;
-                parser(pageParser.getLast());
+                parserPage(pageParser.getLast());
             }
         });
         findViewById(R.id.btn_next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(pageParser.getNext() == null) return;
-                parser(pageParser.getNext());
+                parserPage(pageParser.getNext());
             }
         });
         findViewById(R.id.btn_list).setOnClickListener(new View.OnClickListener() {
@@ -45,10 +97,15 @@ public class MainActivity extends AppCompatActivity {
                 showListDialog();
             }
         });
-        //----------------
     }
 
-    private void parser(String url) {
+    private void parserPage(String url) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(new ProgressBar(this))
+                .setTitle("Loading...")
+                .setCancelable(false);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
         pageParser = new PageParser(url,new Runnable() {
             @Override
             public void run() {
@@ -57,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         ((TextView)findViewById(R.id.tv_bookname)).setText(pageParser.getBookName());
                         ((TextView)findViewById(R.id.tv_content)).setText(pageParser.getContent());
+                        dialog.dismiss();
                     }
                 });
             }
@@ -69,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(novelParser.getListLinkTexts(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        parser(novelParser.getListLink(which));
+                        parserPage(novelParser.getListLink(which));
                         dialog.dismiss();
                     }
                 }).show();

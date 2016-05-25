@@ -50,6 +50,7 @@ public class NovelParser {
                     parser = new Parser((new URL(url)).openConnection());
                     parser.setEncoding("gbk");
                     parserList();
+                    if(callback != null) callback.run();
                 } catch (MalformedURLException e){
                 } catch (ParserException e) {
                 } catch (IOException e) {
