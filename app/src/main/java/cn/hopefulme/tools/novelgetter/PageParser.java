@@ -17,7 +17,7 @@ import java.net.URL;
 /**
  * Created by hopef on 2016/5/24.
  * 页面解析器
- * 解析指定url页面
+ * 解析指定url页面，取得章节内容
  */
 public class PageParser {
 
@@ -31,6 +31,8 @@ public class PageParser {
 
     private String next;
 
+    private String list;
+
     public String getContent() {
         return content == null ? "" : content;
     }
@@ -40,11 +42,11 @@ public class PageParser {
     }
 
     public String getLast() {
-        return last;
+        return last.equals(list) ? null : last;
     }
 
     public String getNext() {
-        return next;
+        return next.equals(list) ? null : next;
     }
 
     public PageParser(final String url,final Runnable callback) {
@@ -57,6 +59,8 @@ public class PageParser {
                     content = parserContent();
                     parser.reset();
                     bookname = parserBookName();
+                    parser.reset();
+                    list = parserList();
                     parser.reset();
                     last = parserLast();
                     parser.reset();
@@ -119,6 +123,18 @@ public class PageParser {
     private String parserNext() {
         if(parser == null) return null;
         NodeFilter filter = new StringFilter("下一章");
+        try {
+            NodeList nodes = parser.extractAllNodesThatMatch(filter);
+            return nodes.size() > 0 ? ((LinkTag)nodes.elementAt(0).getParent()).getLink() : null;
+        } catch (ParserException e) {
+
+        }
+        return null;
+    }
+
+    private String parserList() {
+        if(parser == null) return null;
+        NodeFilter filter = new StringFilter("章节列表");
         try {
             NodeList nodes = parser.extractAllNodesThatMatch(filter);
             return nodes.size() > 0 ? ((LinkTag)nodes.elementAt(0).getParent()).getLink() : null;
