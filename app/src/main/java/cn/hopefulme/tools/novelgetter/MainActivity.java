@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         inputDialog.show();
     }
 
-    private void parserNovel(String url) {
+    private void parserNovel(final String url) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(new ProgressBar(this))
                 .setTitle("Loading...")
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        ((TextView)findViewById(R.id.tv_source)).setText("小说内容来自:"+url);
                         dialog.dismiss();
                         parserPage(novelParser.getListLink(0));
                     }
