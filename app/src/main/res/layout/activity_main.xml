@@ -13,18 +13,21 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_bookname" />
+        android:id="@+id/tv_bookname"
+        android:textSize="24dp"/>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:id="@+id/sv_content"
         android:layout_below="@id/tv_bookname">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_content" />
+            android:id="@+id/tv_content"
+            android:textSize="20dp"/>
 
     </ScrollView>
 

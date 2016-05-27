@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ((TextView)findViewById(R.id.tv_source)).setText("小说内容来自:"+url);
                         dialog.dismiss();
                         parserPage(novelParser.getListLink(0));
                     }
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void parserPage(String url) {
+    private void parserPage(final String url) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(new ProgressBar(this))
                 .setTitle("Loading...")
@@ -113,8 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        ((TextView)findViewById(R.id.tv_source)).setText("以上内容来自:" + url);
                         ((TextView)findViewById(R.id.tv_bookname)).setText(pageParser.getBookName());
                         ((TextView)findViewById(R.id.tv_content)).setText(pageParser.getContent());
+                        ((ScrollView)findViewById(R.id.sv_content)).fullScroll(ScrollView.FOCUS_UP);
                         dialog.dismiss();
                     }
                 });
